@@ -15,7 +15,8 @@ const db = new JobDatabase(config.databasePath);
 const sources = config.sources.ashbyBoards.map((board) => new AshbySource(board));
 const fetched = await Promise.all(sources.map((source) => source.fetchJobs()));
 for (const job of fetched.flat()) {
-  db.save(job);
+  // Queue eligible new jobs so the ones this preview doesn't post still reach a scheduled post.
+  if (db.save(job) && scoreJob(job, config).eligible) db.markQueued(job);
 }
 
 const candidates: ScoredJob[] = db.unpostedJobs()
