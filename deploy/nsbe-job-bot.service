@@ -1,0 +1,17 @@
+[Unit]
+Description=UNLV NSBE Discord job bot
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=ec2-user
+WorkingDirectory=/opt/nsbe-job-bot
+ExecStart=/usr/bin/node dist/src/index.js
+Environment=NODE_ENV=production
+Restart=always
+RestartSec=10
+MemoryMax=600M
+
+[Install]
+WantedBy=multi-user.target

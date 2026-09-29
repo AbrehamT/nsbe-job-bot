@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { readFileSync } from "node:fs";
 import { z } from "zod";
+import { weekdays } from "./schedule.js";
 
 const fileSchema = z.object({
   pollMinutes: z.number().int().min(5).default(60),
@@ -9,6 +10,11 @@ const fileSchema = z.object({
   maximumAgeDays: z.number().int().min(1).default(21),
   postInitialBackfill: z.boolean().default(false),
   localBoostTerms: z.array(z.string()).default(["Nevada", "Las Vegas"]),
+  postSchedule: z.object({
+    timeZone: z.string().default("America/Los_Angeles"),
+    days: z.array(z.enum(weekdays)).min(1).default(["mon", "tue", "wed", "thu", "fri"]),
+    times: z.array(z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/, "use 24-hour HH:MM")).min(1)
+  }).optional(),
   sources: z.object({
     greenhouseBoards: z.array(z.string()).default([]),
     leverSites: z.array(z.string()).default([]),

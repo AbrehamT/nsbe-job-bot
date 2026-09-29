@@ -25,4 +25,10 @@ publisher = new DiscordPublisher(config, db, () => service.run());
 await publisher.start();
 await service.run();
 setInterval(() => void service.run(), config.pollMinutes * 60_000).unref();
+if (config.postSchedule) {
+  const { days, times, timeZone } = config.postSchedule;
+  console.log(`Posting on ${days.join(",")} at ${times.join(",")} ${timeZone}.`);
+  await service.postIfDue();
+  setInterval(() => void service.postIfDue().catch((error) => console.error("Scheduled post failed:", error)), 60_000);
+}
 console.log(`NSBE job bot started with ${sources.length} source connectors.`);

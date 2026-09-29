@@ -1,10 +1,15 @@
 {
   "pollMinutes": 60,
-  "maxPostsPerCycle": 10,
+  "maxPostsPerCycle": 5,
   "minimumScore": 55,
   "maximumAgeDays": 21,
   "postInitialBackfill": false,
   "localBoostTerms": ["Nevada", "Las Vegas", "Henderson", "Reno"],
+  "postSchedule": {
+    "timeZone": "America/Los_Angeles",
+    "days": ["mon", "tue", "wed", "thu", "fri"],
+    "times": ["09:00"]
+  },
   "sources": {
     "greenhouseBoards": [],
     "leverSites": [],

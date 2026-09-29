@@ -31,6 +31,10 @@ export class JobDatabase {
         value TEXT NOT NULL
       );
     `);
+    const columns = this.db.prepare("PRAGMA table_info(jobs)").all() as Array<{ name: string }>;
+    if (!columns.some((column) => column.name === "queued_at")) {
+      this.db.exec("ALTER TABLE jobs ADD COLUMN queued_at TEXT");
+    }
   }
 
   save(job: Job): boolean {
@@ -72,6 +76,18 @@ export class JobDatabase {
       .run(new Date().toISOString(), job.source, job.externalId);
   }
 
+  markQueued(job: Job): void {
+    this.db.prepare("UPDATE jobs SET queued_at = ? WHERE source = ? AND external_id = ?")
+      .run(new Date().toISOString(), job.source, job.externalId);
+  }
+
+  queuedJobs(): Job[] {
+    const rows = this.db.prepare(
+      "SELECT payload FROM jobs WHERE queued_at IS NOT NULL AND posted_at IS NULL"
+    ).all() as Array<{ payload: string }>;
+    return rows.map((row) => JSON.parse(row.payload) as Job);
+  }
+
   unpostedJobs(): Job[] {
     const rows = this.db.prepare("SELECT payload FROM jobs WHERE posted_at IS NULL").all() as Array<{ payload: string }>;
     return rows.map((row) => JSON.parse(row.payload) as Job);
@@ -86,10 +102,21 @@ export class JobDatabase {
       .run(new Date().toISOString());
   }
 
-  stats(): { total: number; posted: number } {
-    return this.db.prepare(
-      "SELECT COUNT(*) AS total, COUNT(posted_at) AS posted FROM jobs"
-    ).get() as { total: number; posted: number };
+  getMeta(key: string): string | undefined {
+    const row = this.db.prepare("SELECT value FROM metadata WHERE key = ?").get(key) as { value: string } | undefined;
+    return row?.value;
+  }
+
+  setMeta(key: string, value: string): void {
+    this.db.prepare("INSERT OR REPLACE INTO metadata(key, value) VALUES(?, ?)").run(key, value);
+  }
+
+  stats(): { total: number; posted: number; queued: number } {
+    return this.db.prepare(`
+      SELECT COUNT(*) AS total, COUNT(posted_at) AS posted,
+        COUNT(CASE WHEN queued_at IS NOT NULL AND posted_at IS NULL THEN 1 END) AS queued
+      FROM jobs
+    `).get() as { total: number; posted: number; queued: number };
   }
 }
 

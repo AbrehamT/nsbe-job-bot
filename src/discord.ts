@@ -86,7 +86,7 @@ export class DiscordPublisher {
   private async handleCommand(interaction: ChatInputCommandInteraction): Promise<void> {
     if (interaction.commandName === "jobs-status") {
       const stats = this.db.stats();
-      await interaction.reply({ content: `Tracking ${stats.total} jobs; ${stats.posted} posted to Discord.`, ephemeral: true });
+      await interaction.reply({ content: `Tracking ${stats.total} jobs; ${stats.posted} posted to Discord; ${stats.queued} queued for the next post.`, ephemeral: true });
       return;
     }
     if (interaction.commandName === "jobs-run-now") {
