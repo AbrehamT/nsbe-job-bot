@@ -54,6 +54,18 @@ describe("scoreJob", () => {
     const result = scoreJob({ ...base, location: "Toronto, ON" }, options);
     expect(result.eligible).toBe(false);
   });
+
+  it("does not read 'internal' as an internship", () => {
+    const result = scoreJob({ ...base, title: "Application Software Engineer, Internal Systems" }, options);
+    expect(result.reasons).not.toContain("student or early-career opportunity");
+    expect(result.eligible).toBe(false);
+  });
+
+  it("still matches early-career terms as whole words", () => {
+    expect(scoreJob({ ...base, title: "Software Engineering Intern (Summer 2027)" }, options).eligible).toBe(true);
+    expect(scoreJob({ ...base, title: "Electrical Engineer, Co-op" }, options).eligible).toBe(true);
+    expect(scoreJob({ ...base, title: "2026 Early Career Electrical Engineer" }, options).eligible).toBe(true);
+  });
 });
 
 describe("makeFingerprint", () => {

@@ -11,9 +11,9 @@
     "times": ["09:00"]
   },
   "sources": {
-    "greenhouseBoards": [],
-    "leverSites": [],
-    "ashbyBoards": ["skydio", "rivianvw.tech", "allen-control-systems"],
+    "greenhouseBoards": ["andurilindustries", "astranis", "databricks", "figma", "formlabs", "nuro", "relativity", "rocketlab", "scaleai", "spacex", "stripe", "waymo"],
+    "leverSites": ["shieldai"],
+    "ashbyBoards": ["skydio", "rivianvw.tech", "allen-control-systems", "ramp"],
     "remoteOk": false,
     "usaJobs": true
   }

@@ -13,6 +13,11 @@ const earlyCareerTerms = [
   "entry-level", "early career", "university graduate", "rotational", "pathways"
 ];
 
+// Whole words only, so "Internal Systems" or "cooperative" don't read as internships.
+const earlyCareerPattern = new RegExp(
+  `\\b(?:${earlyCareerTerms.map((term) => term.replace(/[.*+?^${}()|[\]\\-]/g, "\\$&")).join("|")})\\b`
+);
+
 const seniorTerms = [
   "senior", "sr.", "staff", "principal", "lead engineer", "manager", "director", "architect"
 ];
@@ -49,7 +54,7 @@ export function scoreJob(job: Job, options: ScoringOptions): ScoredJob {
     reasons.push("engineering role");
   }
 
-  const earlyCareer = earlyCareerTerms.some((term) => careerSignal.includes(term)) ||
+  const earlyCareer = earlyCareerPattern.test(careerSignal) ||
     /\bengineer i\b(?!i)/.test(careerSignal);
   if (earlyCareer) {
     score += 30;

@@ -11,6 +11,7 @@ export class JobDatabase {
     this.db = new DatabaseSync(path);
     this.db.exec(`
       PRAGMA journal_mode = WAL;
+      PRAGMA busy_timeout = 30000;
       CREATE TABLE IF NOT EXISTS jobs (
         id INTEGER PRIMARY KEY,
         source TEXT NOT NULL,
